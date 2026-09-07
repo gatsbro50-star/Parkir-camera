@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Parkir - Firebase & Printer C58</title>
+    <title>Sistem Parkir - Direct Bluetooth Print C58</title>
     <!-- Library QRCode & Tesseract AI OCR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <!-- Firebase SDK v9 (Modular via CDN) -->
+    <!-- Firebase SDK v9 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, set, push, remove, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // ================= CONTOH KONFIGURASI FIREBASE ANDA =================
+        // ================= MASUKKAN KONFIGURASI FIREBASE ANDA DI SINI =================
         const firebaseConfig = {
-            apiKey: "API_KEY_ANDA_DISINI",
+            apiKey: "API_KEY_ANDA",
             authDomain: "PROJECT_ANDA.firebaseapp.com",
             databaseURL: "https://PROJECT_ANDA-default-rtdb.firebaseio.com",
             projectId: "PROJECT_ANDA",
@@ -42,34 +42,17 @@
         .btn-auto { background: #28a745; }
         .btn-manual { background: #ffc107; color: #333; }
         .btn-bt { background: #6f42c1; }
-        .btn-auto:disabled, .btn-manual:disabled { background: #cccccc; cursor: not-allowed; color: #666; }
+        .btn-auto:disabled, .btn-manual:disabled, .btn-bt:disabled { background: #cccccc; cursor: not-allowed; color: #666; }
         
         .btn-menu { background: #007bff; margin-top: 15px; font-size: 1rem; padding: 10px; }
         .btn-keluar { background: #dc3545; }
         
         .view-section { display: none; }
         .active-view { display: block; }
-        #status-info { font-size: 0.9rem; color: #d9534f; margin: 5px 0; font-weight: bold; min-height: 20px; }
+        #status-info { font-size: 0.95rem; color: #d9534f; margin: 8px 0; font-weight: bold; min-height: 25px; }
 
         .divider { margin: 15px 0; border-top: 1px dashed #ccc; position: relative; }
         .divider span { background: white; padding: 0 10px; position: relative; top: -10px; font-size: 0.85rem; color: #777; }
-
-        /* ================= TAMPILAN FORMAT KHUSUS STRUK 58mm ================= */
-        .struk-preview {
-            background: #fff;
-            border: 1px dashed #999;
-            padding: 10px;
-            margin: 10px auto;
-            width: 260px;
-            text-align: left;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            line-height: 1.4;
-            display: none;
-        }
-        .struk-preview center { text-align: center; }
-        #preview-qrcode { display: flex; justify-content: center; margin: 8px 0; }
-        #preview-qrcode img { width: 90px; height: 90px; }
 
         .verif-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; margin-top: 10px; }
         .info-box { text-align: left; margin-top: 15px; font-size: 1rem; line-height: 1.5; background: #f9f9f9; padding: 10px; border-radius: 5px; }
@@ -82,19 +65,19 @@
         <h2>Gate Masuk Parkir</h2>
         <video id="camera-stream" autoplay playsinline></video>
         
-        <div id="status-info">Siap ambil foto...</div>
+        <div id="status-info">Menunggu koneksi printer Bluetooth...</div>
 
-        <!-- Tombol Hubungkan Printer Bluetooth C58 -->
-        <button class="btn-bt" onclick="hubungkanPrinterBT()">🔗 Hubungkan Printer Bluetooth C58</button>
+        <!-- Tombol Wajib Hubungkan Printer C58 Dahulu -->
+        <button id="btn-bt" class="btn-bt" onclick="hubungkanPrinterBT()">🔗 Hubungkan Printer Bluetooth C58</button>
 
-        <!-- Tombol Utama: Auto Foto + AI OCR + Firebase + Cetak -->
-        <button id="btn-auto" class="btn-auto" onclick="prosesParkirAuto()">🚀 Auto (Foto + AI Scan & Cetak)</button>
+        <!-- Tombol Utama: Auto Foto + AI OCR + Firebase + Direct Print -->
+        <button id="btn-auto" class="btn-auto" onclick="prosesParkirAuto()" disabled>🚀 Auto (Foto + AI Scan & Cetak)</button>
 
         <div class="divider"><span>ATAU MANUAL JIKA PLAT BURAM</span></div>
 
         <!-- Opsi Cadangan: Input Manual -->
         <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat Manual (Misal: B 1234 ABC)">
-        <button id="btn-manual" class="btn-manual" onclick="prosesParkirManual()">✍️ Cetak Manual dengan No. Plat Ini</button>
+        <button id="btn-manual" class="btn-manual" onclick="prosesParkirManual()" disabled>✍️ Cetak Manual dengan No. Plat Ini</button>
         
         <button class="btn-menu" onclick="switchView('view-cek')">Menu Keluar / Verifikasi</button>
     </div>
@@ -112,29 +95,12 @@
 
     <canvas id="canvas" style="display:none;"></canvas>
 
-    <!-- ================= FORMAT STRUK TAMPILAN LAYAR (DI PRINT KE C58) ================= -->
-    <div id="struk-preview-box" class="struk-preview">
-        <center>
-            <strong>PARKIR MANDIRI C58</strong><br>
-            Jl. Otomatis No. 1<br>
-            --------------------------------
-        </center>
-        <strong>No. Plat :</strong> <span id="s-plat"></span><br>
-        <strong>Masuk    :</strong> <span id="s-waktu"></span><br>
-        --------------------------------<br>
-        <center>
-            <div id="preview-qrcode"></div>
-            Simpan karcis ini!<br>
-            Terima Kasih<br>
-            ================================
-        </center>
-    </div>
-
     <script>
         const video = document.getElementById('camera-stream');
         const statusInfo = document.getElementById('status-info');
         const btnAuto = document.getElementById('btn-auto');
         const btnManual = document.getElementById('btn-manual');
+        const btnBt = document.getElementById('btn-bt');
         
         let bluetoothDevice = null;
         let bluetoothCharacteristic = null;
@@ -150,25 +116,50 @@
             if(viewId === 'view-cek') muatDaftarTiketFirebase();
         }
 
-        // 1. Hubungkan Printer Bluetooth C58 lewat Web Bluetooth API
+        // 1. Hubungkan Printer Bluetooth C58 via Web Bluetooth API
         async function hubungkanPrinterBT() {
             try {
-                statusInfo.innerText = "Mencari printer Bluetooth...";
+                statusInfo.innerText = "Mencari perangkat Bluetooth...";
                 bluetoothDevice = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
-                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // UUID umum printer thermal
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2']
                 });
                 
+                statusInfo.innerText = "Menghubungkan ke printer...";
                 const server = await bluetoothDevice.gatt.connect();
-                const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-                bluetoothCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
                 
-                statusInfo.innerText = "Printer C58 Terhubung!";
-                alert("Printer Bluetooth C58 berhasil terhubung!");
+                // Cari service printer thermal secara otomatis
+                const services = await server.getPrimaryServices();
+                let foundService = null;
+                let foundChar = null;
+
+                for (let service of services) {
+                    const characteristics = await service.getCharacteristics();
+                    for (let char of characteristics) {
+                        if (char.properties.write || char.properties.writeWithoutResponse) {
+                            foundService = service;
+                            foundChar = char;
+                            break;
+                        }
+                    }
+                    if (foundChar) break;
+                }
+
+                if (foundChar) {
+                    bluetoothCharacteristic = foundChar;
+                    statusInfo.innerText = "Printer C58 Siap Digunakan!";
+                    btnBt.style.background = "#28a745";
+                    btnBt.innerText = "✔ Printer C58 Terhubung";
+                    btnAuto.disabled = false;
+                    btnManual.disabled = false;
+                } else {
+                    throw new Error("Karakteristik printer tidak ditemukan.");
+                }
+
             } catch (error) {
                 console.error(error);
-                statusInfo.innerText = "Gagal terhubung Bluetooth.";
-                alert("Gagal terhubung ke printer. Pastikan Bluetooth aktif.");
+                statusInfo.innerText = "Koneksi Bluetooth gagal!";
+                alert("Gagal terhubung ke printer. Pastikan Bluetooth HP aktif dan printer menyala.");
             }
         }
 
@@ -178,59 +169,63 @@
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            return canvas.toDataURL('image/jpeg', 0.7); // Kompres agar muat di Firebase
+            return canvas.toDataURL('image/jpeg', 0.6); // Kompres agar ringan disimpan ke Firebase
         }
 
-        // 2. Simpan ke Firebase & Cetak via Bluetooth / Fallback Print
-        async function simpanKeFirebaseDanCetak(finalPlat, imageBase64) {
+        // 2. Simpan ke Firebase & Langsung Kirim Perintah Cetak ke Bluetooth C58
+        async function simpanFirebaseDanCetakBluetooth(finalPlat, imageBase64) {
             const ticketId = 'P' + Date.now().toString().slice(-6);
             const waktuMasuk = new Date().toLocaleString('id-ID');
 
             statusInfo.innerText = "Menyimpan foto ke Firebase...";
 
             try {
-                // Simpan data ke Firebase Database (Tanpa memori HP)
+                // Simpan data & foto ke Firebase Realtime Database
                 const parkirRef = window.ref(window.db, 'parkir_aktif/' + ticketId);
                 await window.set(parkirRef, {
                     ticketId: ticketId,
                     noPlat: finalPlat,
                     waktuMasuk: waktuMasuk,
-                    foto: imageBase64 // Disimpan di Firebase Realtime Database
+                    foto: imageBase64
                 });
 
-                // Tampilkan format struk
-                document.getElementById('s-plat').innerText = finalPlat;
-                document.getElementById('s-waktu').innerText = waktuMasuk;
-                
-                const qrContainer = document.getElementById('preview-qrcode');
-                qrContainer.innerHTML = "";
-                new QRCode(qrContainer, { text: ticketId, width: 90, height: 90 });
+                statusInfo.innerText = "Mengirim data ke printer C58...";
 
-                statusInfo.innerText = "Mencetak struk...";
+                // Format Perintah Struk ESC/POS khusus Printer Thermal 58mm
+                const ESC = '\x1B';
+                const GS = '\x1D';
+                let perintahCetak = 
+                    ESC + '\x40' +                 // Initialize printer
+                    ESC + '\x61' + '\x01' +        // Center alignment
+                    '\x1B\x21\x30' + 'PARKIR MANDIRI\n' + // Double height/width text
+                    '\x1B\x21\x00' + 'Jl. Otomatis No. 1 C58\n' +
+                    '--------------------------------\n' +
+                    ESC + '\x61' + '\x00' +        // Left alignment
+                    'No. Plat : ' + finalPlat + '\n' +
+                    'Masuk    : ' + waktuMasuk + '\n' +
+                    'ID Tiket : ' + ticketId + '\n' +
+                    '--------------------------------\n' +
+                    ESC + '\x61' + '\x01' +        // Center alignment
+                    'Simpan Karis Ini!\n' +
+                    'Terima Kasih\n\n\n' +
+                    GS + '\x56\x42\x00';          // Cut paper (jika didukung printer)
 
-                // Jika terhubung via Bluetooth ESC/POS, cetak langsung. Jika belum, gunakan window.print() normal.
-                if (bluetoothCharacteristic) {
-                    let teksCetak = `\n    PARKIR MANDIRI C58\n    Jl. Otomatis No. 1\n--------------------------------\nNo. Plat : ${finalPlat}\nMasuk    : ${waktuMasuk}\n--------------------------------\n   Simpan Karcis Ini!\n      Terima Kasih\n\n\n`;
-                    let encoder = new TextEncoder();
-                    await bluetoothCharacteristic.writeValue(encoder.encode(teksCetak));
-                } else {
-                    // Fallback jika bluetooth belum diklik, tampilkan print biasa
-                    window.print();
-                }
+                let encoder = new TextEncoder();
+                await bluetoothCharacteristic.writeValue(encoder.encode(perintahCetak));
 
-                statusInfo.innerText = "Siap ambil foto...";
+                statusInfo.innerText = "Selesai! Siap ambil foto berikutnya...";
                 btnAuto.disabled = false;
                 btnManual.disabled = false;
 
             } catch (error) {
-                console.error("Gagal simpan ke Firebase:", error);
-                alert("Gagal menyimpan ke Firebase. Periksa koneksi internet & konfigurasi Anda.");
+                console.error("Error:", error);
+                alert("Terjadi kesalahan saat menyimpan ke Firebase atau mencetak.");
                 btnAuto.disabled = false;
                 btnManual.disabled = false;
             }
         }
 
-        // 3. Tombol Auto (Foto + AI OCR + Firebase)
+        // 3. Tombol Auto (Foto + AI OCR + Firebase + Bluetooth Print)
         async function prosesParkirAuto() {
             btnAuto.disabled = true;
             btnManual.disabled = true;
@@ -238,7 +233,7 @@
             statusInfo.innerText = "1/3. Mengambil foto kendaraan...";
             const imageBase64 = ambilFotoCanvas();
 
-            statusInfo.innerText = "2/3. AI membaca nomor plat...";
+            statusInfo.innerText = "2/3. AI sedang membaca nomor plat...";
             let finalPlat = "";
             try {
                 const result = await Tesseract.recognize(imageBase64, 'eng');
@@ -256,28 +251,26 @@
                 finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " XXX";
             }
 
-            statusInfo.innerText = "3/3. Proses Firebase & Cetak...";
-            simpanKeFirebaseDanCetak(finalPlat, imageBase64);
+            statusInfo.innerText = "3/3. Simpan Firebase & Auto Print...";
+            simpanFirebaseDanCetakBluetooth(finalPlat, imageBase64);
         }
 
-        // 4. Tombol Manual (Input Plat + Firebase)
+        // 4. Tombol Manual (Input Plat + Firebase + Bluetooth Print)
         function prosesParkirManual() {
             const inputPlat = document.getElementById('input-manual-plat').value.trim().toUpperCase();
             if (!inputPlat) {
                 alert("Silakan ketik nomor plat kendaraan terlebih dahulu!");
-                btnAuto.disabled = false;
-                btnManual.disabled = false;
                 return;
             }
 
             btnAuto.disabled = true;
             btnManual.disabled = true;
-            statusInfo.innerText = "Mengambil foto & simpan Firebase...";
+            statusInfo.innerText = "Memproses input manual...";
             
             const imageBase64 = ambilFotoCanvas();
             document.getElementById('input-manual-plat').value = '';
 
-            simpanKeFirebaseDanCetak(inputPlat, imageBase64);
+            simpanFirebaseDanCetakBluetooth(inputPlat, imageBase64);
         }
 
         // Muat daftar kendaraan keluar dari Firebase
