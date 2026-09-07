@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parkir Karnaval - 1 File</title>
+    <title>Parkir Karnaval - Single File</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 10px; box-sizing: border-box; display: flex; justify-content: center; }
         .main-wrapper { width: 100%; max-width: 400px; box-sizing: border-box; }
@@ -26,11 +25,8 @@
         video { width: 100%; aspect-ratio: 3/4; display: block; object-fit: cover; }
         input, select { width: 100%; padding: 9px; margin: 6px 0; font-size: 0.85rem; text-align: center; box-sizing: border-box; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 6px; }
         button.action-btn { width: 100%; padding: 10px; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 6px; font-weight: bold; }
-        .btn-auto { background: #16a34a; }
-        .btn-manual { background: #ca8a04; color: #000; }
+        .btn-manual { background: #16a34a; }
         #status-info { font-size: 0.8rem; color: #38bdf8; margin: 6px 0; font-weight: bold; min-height: 18px; text-align: center; }
-        .divider { margin: 10px 0; border-top: 1px dashed #475569; position: relative; text-align: center; }
-        .divider span { background: #1e293b; padding: 0 8px; position: relative; top: -9px; font-size: 0.7rem; color: #94a3b8; }
 
         /* Halaman 2 */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
@@ -64,7 +60,7 @@
 
         /* Halaman 3 */
         .info-box { text-align: left; margin-top: 10px; font-size: 0.8rem; line-height: 1.4; background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #475569; }
-        .verif-img-full { width: 100%; max-height: 180px; object-fit: contain; background: #000; border-radius: 6px; border: 1px solid #475569; margin-top: 6px; }
+        .verif-img-full { width: 100%; max-height: 280px; object-fit: contain; background: #000; border-radius: 6px; border: 1px solid #475569; margin-top: 6px; display: block; }
         .btn-keluar { background: #dc2626; width: 100%; padding: 10px; font-size: 0.85rem; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
@@ -75,7 +71,6 @@
             <button id="btn-bt" class="btn-top" onclick="hubungkanPrinterBT()" type="button">🖨️ Printer</button>
         </div>
 
-        <!-- Tombol Menu Pindah Tampilan dalam 1 File -->
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="gantiTab(1)" id="tab-btn-1">1. Input</button>
             <button class="tab-btn" onclick="gantiTab(2)" id="tab-btn-2">2. Data</button>
@@ -88,10 +83,8 @@
                 <video id="camera-stream" autoplay playsinline></video>
             </div>
             <div id="status-info">Kamera siap...</div>
-            <button class="action-btn btn-auto" onclick="prosesParkirAuto()" type="button">🚀 Auto (Foto + AI Scan & Cetak)</button>
-            <div class="divider"><span>ATAU MANUAL</span></div>
             <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat (Contoh: B 1234 HJ)">
-            <button class="action-btn btn-manual" onclick="prosesParkirManual()" type="button">✍️ Cetak Manual No. Plat Ini</button>
+            <button class="action-btn btn-manual" onclick="prosesParkirInput()" type="button">💾 Simpan & Cetak Otomatis</button>
         </div>
 
         <!-- HALAMAN 2: DATA & REPRINT -->
@@ -219,60 +212,39 @@
             } catch (err) { return false; }
         }
 
-        async function simpanLokalDanCetak(finalPlat, imageBase64) {
+        async function prosesParkirInput() {
+            const inputPlat = document.getElementById('input-manual-plat').value.trim().toUpperCase();
+            if (!inputPlat) { 
+                alert("Silakan ketik nomor plat kendaraan terlebih dahulu!"); 
+                return; 
+            }
+
+            const imageBase64 = ambilFotoCanvas();
             const ticketId = 'P' + Date.now().toString().slice(-6);
             const waktuMasuk = new Date().toLocaleString('id-ID');
-            statusInfo.innerText = "Menyimpan...";
+            statusInfo.innerText = "Menyimpan & Mencetak...";
 
             try {
                 let dataParkir = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA)) || {};
                 let folderFoto = JSON.parse(localStorage.getItem(STORAGE_KEY_FOTO)) || {};
 
-                dataParkir[ticketId] = { ticketId: ticketId, noPlat: finalPlat, waktuMasuk: waktuMasuk };
+                dataParkir[ticketId] = { ticketId: ticketId, noPlat: inputPlat, waktuMasuk: waktuMasuk };
                 folderFoto[ticketId] = imageBase64;
 
                 localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(dataParkir));
                 localStorage.setItem(STORAGE_KEY_FOTO, JSON.stringify(folderFoto));
 
+                // Cetak otomatis jika printer terhubung
                 if (bluetoothCharacteristic) {
-                    await kirimPrintBluetooth(finalPlat, waktuMasuk, ticketId);
+                    await kirimPrintBluetooth(inputPlat, waktuMasuk, ticketId);
                 }
                 
-                statusInfo.innerText = "Berhasil Disimpan!";
-                alert("Berhasil Disimpan!\nNo Plat: " + finalPlat);
+                document.getElementById('input-manual-plat').value = '';
+                statusInfo.innerText = "Berhasil Disimpan & Dicetak!";
+                alert("Parkir Berhasil Disimpan!\nNo Plat: " + inputPlat);
             } catch (error) { 
-                alert("Gagal menyimpan."); 
+                alert("Gagal menyimpan data."); 
             }
-        }
-
-        async function prosesParkirAuto() {
-            statusInfo.innerText = "Mengambil foto...";
-            const imageBase64 = ambilFotoCanvas();
-            statusInfo.innerText = "AI membaca plat...";
-            
-            let finalPlat = "";
-            try {
-                const result = await Tesseract.recognize(imageBase64, 'eng');
-                let text = result.data.text.replace(/[\n\r]+/g, ' ').replace(/[^A-Z0-9]/g, ' ').trim();
-                let words = text.split(/\s+/).filter(w => w.length >= 2 && w.length <= 8);
-                if (words.length > 0) {
-                    finalPlat = words.slice(0, 2).join(' ');
-                }
-            } catch (err) {}
-
-            if (!finalPlat || finalPlat.length < 3) {
-                finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " HJ";
-            }
-
-            simpanLokalDanCetak(finalPlat, imageBase64);
-        }
-
-        function prosesParkirManual() {
-            const inputPlat = document.getElementById('input-manual-plat').value.trim().toUpperCase();
-            if (!inputPlat) { alert("Ketik nomor plat dulu!"); return; }
-            const imageBase64 = ambilFotoCanvas();
-            document.getElementById('input-manual-plat').value = '';
-            simpanLokalDanCetak(inputPlat, imageBase64);
         }
 
         function renderData() {
@@ -364,6 +336,7 @@
             link.click();
         }
 
+        // Halaman 3 (Keluar & Tampil Foto Full)
         function muatDaftarTiketLokal() {
             const select = document.getElementById('select-ticket');
             select.innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
@@ -381,8 +354,11 @@
 
         function cariBarcodeKeluar() {
             const query = document.getElementById('input-scan-barcode').value.trim();
-            if(query.length >= 4) tampilkanDataKeluar(query);
-            else document.getElementById('detail-verifikasi').innerHTML = '';
+            if(query.length >= 4) {
+                tampilkanDataKeluar(query);
+            } else {
+                document.getElementById('detail-verifikasi').innerHTML = '';
+            }
         }
 
         function pilihDariDropdown() {
@@ -407,13 +383,13 @@
                             <strong>ID Karcis:</strong> ${item.ticketId}<br>
                             <strong>No Plat:</strong> ${item.noPlat}<br>
                             <strong>Waktu Masuk:</strong> ${item.waktuMasuk}<br>
-                            <p style="margin:6px 0 2px 0;"><strong>Foto Kendaraan:</strong></p>
-                            <img src="${fotoBase64}" class="verif-img-full" alt="Foto">
+                            <p style="margin:8px 0 4px 0;"><strong>Foto Kendaraan (Full):</strong></p>
+                            <img src="${fotoBase64}" class="verif-img-full" alt="Foto Kendaraan">
                         </div>
                         <button class="btn-keluar" onclick="konfirmasiKeluar('${ticketId}')" type="button">✅ Konfirmasi Keluar & Hapus</button>
                     `;
                 } else {
-                    detailBox.innerHTML = `<div style="font-size:0.78rem; color:#f87171; margin-top:8px; text-align:center;">ID "${ticketId}" tidak ditemukan!</div>`;
+                    detailBox.innerHTML = `<div style="font-size:0.78rem; color:#f87171; margin-top:8px; text-align:center;">ID Karcis "${ticketId}" tidak ditemukan!</div>`;
                 }
             } catch (error) {}
         }
