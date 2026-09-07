@@ -3,69 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Parkir Karnaval</title>
-    <!-- Library QRCode & Tesseract AI OCR -->
+    <title>Halaman 1 - Gate Masuk</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 5px; background: #121824; color: #fff; box-sizing: border-box; }
         .container { background: #1e293b; padding: 8px 10px; border-radius: 8px; display: inline-block; width: 100%; max-width: 320px; box-sizing: border-box; box-shadow: 0px 3px 10px rgba(0,0,0,0.4); }
-        
-        h2 { font-size: 1rem; margin: 3px 0 6px 0; letter-spacing: 0.5px; }
-
-        /* Jendela Tampilan Kamera Diperbesar */
+        h2 { font-size: 1rem; margin: 3px 0 6px 0; }
         .camera-box { width: 100%; max-width: 280px; margin: 0 auto; border-radius: 6px; overflow: hidden; background: #000; border: 2px solid #475569; }
         video { width: 100%; aspect-ratio: 4/3; display: block; object-fit: cover; }
-
-        input, select { width: 100%; padding: 7px; margin: 4px 0; font-size: 0.85rem; text-align: center; box-sizing: border-box; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 5px; }
-        
-        button { width: 100%; padding: 8px; font-size: 0.85rem; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 4px; font-weight: bold; pointer-events: auto !important; opacity: 1 !important; }
-        button:active { opacity: 0.8; }
-        
+        input { width: 100%; padding: 7px; margin: 4px 0; font-size: 0.85rem; text-align: center; box-sizing: border-box; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 5px; }
+        button { width: 100%; padding: 8px; font-size: 0.85rem; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 4px; font-weight: bold; text-decoration: none; display: inline-block; box-sizing: border-box; }
         .btn-auto { background: #22c55e; }
         .btn-manual { background: #eab308; color: #000; }
         .btn-bt { background: #8b5cf6; font-size: 0.8rem; padding: 6px; }
-        .btn-menu { background: #3b82f6; margin-top: 6px; padding: 7px; }
-        .btn-list { background: #0ea5e9; margin-top: 6px; padding: 7px; }
-        .btn-keluar { background: #ef4444; padding: 8px; font-size: 0.85rem; margin-top: 6px; }
-        .btn-reprint { background: #f97316; padding: 5px 8px; font-size: 0.75rem; border-radius: 4px; margin: 0; width: auto; }
-        .btn-reset { background: #dc2626; margin-top: 8px; font-size: 0.78rem; padding: 6px; }
-
+        .btn-list { background: #0ea5e9; margin-top: 6px; }
+        .btn-keluar { background: #3b82f6; margin-top: 6px; }
         #status-info { font-size: 0.8rem; color: #f87171; margin: 4px 0; font-weight: bold; min-height: 18px; }
-
         .divider { margin: 6px 0; border-top: 1px dashed #475569; position: relative; }
         .divider span { background: #1e293b; padding: 0 6px; position: relative; top: -8px; font-size: 0.7rem; color: #94a3b8; }
-
-        /* Tabel List Kendaraan */
-        .table-container { max-height: 240px; overflow-y: auto; margin-top: 6px; border: 1px solid #475569; border-radius: 5px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; background: #0f172a; text-align: left; }
-        th, td { padding: 6px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
-        th { background: #1e293b; color: #38bdf8; position: sticky; top: 0; }
-
-        /* Preview Struk */
         .preview-modal { background: #0f172a; border: 1px solid #475569; border-radius: 6px; padding: 8px; margin-top: 8px; text-align: left; display: none; }
         .receipt-card { background: #fff; color: #000; padding: 8px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; font-size: 9.5px; text-align: left; line-height: 1.25; }
-        .receipt-card center { text-align: center; }
         .receipt-title { font-size: 10.5px; font-weight: bold; text-align: center; margin-bottom: 2px; }
         .receipt-plat { font-size: 14px; font-weight: bold; text-align: center; margin: 4px 0; letter-spacing: 1px; }
         #preview-qrcode { display: flex; justify-content: center; margin: 4px 0; }
         #preview-qrcode img { width: 65px; height: 65px; }
-
-        /* Tampilan Foto Full di Halaman 3 */
-        .verif-img-full { width: 100%; max-height: 220px; object-fit: contain; background: #000; border-radius: 4px; border: 1px solid #475569; margin-top: 4px; }
-        .info-box { text-align: left; margin-top: 6px; font-size: 0.83rem; line-height: 1.35; background: #0f172a; padding: 8px; border-radius: 5px; border: 1px solid #475569; }
     </style>
 </head>
 <body>
-
-    <!-- ================= HALAMAN 1: GATE MASUK ================= -->
-    <div id="view-masuk" class="container active-view">
+    <div class="container">
         <h2>PANITIA PARKIR KARNAVAL</h2>
-        
         <div class="camera-box">
             <video id="camera-stream" autoplay playsinline></video>
         </div>
-        
         <div id="status-info">Siap ambil foto & simpan database HP...</div>
 
         <button id="btn-bt" class="btn-bt" onclick="hubungkanPrinterBT()" type="button">🔗 Hubungkan Printer C58</button>
@@ -76,10 +46,10 @@
         <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat (Contoh: B 1234 HJ)">
         <button id="btn-manual" class="btn-manual" onclick="prosesParkirManual()" type="button">✍️ Cetak Manual No. Plat Ini</button>
         
-        <button class="btn-list" onclick="switchView('view-list')" type="button">📋 Halaman 2: Data List & Reprint Struk</button>
-        <button class="btn-menu" onclick="switchView('view-cek')" type="button">🚪 Halaman 3: Scan Barcode Keluar</button>
+        <!-- Pindah file HTML terpisah untuk Halaman 2 dan 3 -->
+        <a href="halaman2.html"><button class="btn-list" type="button">📋 Buka Halaman 2 (Data List & Reprint)</button></a>
+        <a href="halaman3.html"><button class="btn-keluar" type="button">🚪 Buka Halaman 3 (Scan Barcode Keluar)</button></a>
         
-        <!-- PREVIEW STRUK DI LAYAR -->
         <div id="preview-container" class="preview-modal">
             <div style="font-size: 0.75rem; margin-bottom: 4px; font-weight: bold; color: #38bdf8;">Preview Struk Terakhir:</div>
             <div class="receipt-card">
@@ -101,47 +71,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ================= HALAMAN 2: DATA LIST KENDARAAN & REPRINT ================= -->
-    <div id="view-list" class="container view-section" style="display:none;">
-        <h2>Data List Kendaraan (Reprint)</h2>
-        <p style="font-size: 0.8rem; margin: 4px 0;">Database kendaraan masuk & cetak ulang:</p>
-        
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Plat / Waktu</th>
-                        <th style="text-align:center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="list-kendaraan-body">
-                    <tr><td colspan="2" style="text-align:center;">Memuat data...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <button class="btn-reset" onclick="resetSemuaDataHP()" type="button">🗑️ Reset & Hapus Folder Data/Foto HP</button>
-        <button class="btn-menu" style="background:#475569; margin-top:6px;" onclick="switchView('view-masuk')" type="button">⬅️ Kembali ke Gate Masuk</button>
-    </div>
-
-    <!-- ================= HALAMAN 3: SCAN BARCODE KELUAR ================= -->
-    <div id="view-cek" class="container view-section" style="display:none;">
-        <h2>Verifikasi Keluar</h2>
-        <p style="font-size: 0.8rem; margin: 2px 0;">Scan / Ketik ID Karcis (Barcode):</p>
-        
-        <!-- Input Scan Barcode Struk -->
-        <input type="text" id="input-scan-barcode" placeholder="Scan/Ketik ID Karcis (cth: P123456)" oninput="cariBarcodeKeluar()">
-        
-        <div style="font-size: 0.72rem; color: #94a3b8; margin: 2px 0;">Atau pilih dari daftar di bawah:</div>
-        <select id="select-ticket" onchange="pilihDariDropdown()">
-            <option value="">-- Pilih Kendaraan Parkir --</option>
-        </select>
-
-        <div id="detail-verifikasi"></div>
-        <button class="btn-menu" style="background:#475569;" onclick="switchView('view-masuk')" type="button">⬅️ Kembali ke Gate Masuk</button>
-    </div>
-
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
@@ -157,28 +86,9 @@
         const STORAGE_KEY_DATA = 'karnaval_parkir_data';
         const STORAGE_KEY_FOTO = 'karnaval_parkir_folder_foto';
 
-        btnAuto.removeAttribute('disabled');
-        btnManual.removeAttribute('disabled');
-
         navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: 640, height: 480 } })
             .then(stream => { video.srcObject = stream; })
-            .catch(err => alert("Gagal akses kamera! Pastikan menggunakan HTTPS."));
-
-        function switchView(viewId) {
-            document.querySelectorAll('.container').forEach(el => {
-                el.style.display = 'none';
-                el.classList.remove('active-view');
-            });
-            const target = document.getElementById(viewId);
-            target.style.display = 'inline-block';
-            target.classList.add('active-view');
-            if(viewId === 'view-cek') {
-                muatDaftarTiketLokal();
-                document.getElementById('input-scan-barcode').value = '';
-                document.getElementById('detail-verifikasi').innerHTML = '';
-            }
-            if(viewId === 'view-list') muatTabelListKendaraan();
-        }
+            .catch(err => alert("Gagal akses kamera!"));
 
         async function hubungkanPrinterBT() {
             try {
@@ -187,105 +97,54 @@
                     acceptAllDevices: true,
                     optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2']
                 });
-                
-                statusInfo.innerText = "Menghubungkan ke printer...";
                 const server = await bluetoothDevice.gatt.connect();
-                
                 const services = await server.getPrimaryServices();
                 let foundChar = null;
-
                 for (let service of services) {
                     const characteristics = await service.getCharacteristics();
                     for (let char of characteristics) {
-                        if (char.properties.write || char.properties.writeWithoutResponse) {
-                            foundChar = char;
-                            break;
-                        }
+                        if (char.properties.write || char.properties.writeWithoutResponse) { foundChar = char; break; }
                     }
                     if (foundChar) break;
                 }
-
                 if (foundChar) {
                     bluetoothCharacteristic = foundChar;
-                    statusInfo.innerText = "Printer C58 Siap Digunakan!";
+                    statusInfo.innerText = "Printer C58 Siap!";
                     btnBt.style.background = "#22c55e";
-                    btnBt.innerText = "✔ Printer C58 Terhubung";
-                } else {
-                    throw new Error("Karakteristik printer tidak ditemukan.");
-                }
-
-            } catch (error) {
-                console.error(error);
-                statusInfo.innerText = "Koneksi Bluetooth dibatalkan/gagal.";
-            }
+                    btnBt.innerText = "✔ Printer Terhubung";
+                } else { throw new Error(); }
+            } catch (error) { statusInfo.innerText = "Koneksi Bluetooth gagal."; }
         }
 
-        // Resolusi foto diambil lebih proporsional agar saat ditampilkan full di halaman 3 terlihat jelas
         function ambilFotoCanvas() {
             const canvas = document.getElementById('canvas');
-            canvas.width = 400;
-            canvas.height = 300;
+            canvas.width = 400; canvas.height = 300;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, 400, 300);
             return canvas.toDataURL('image/jpeg', 0.35); 
         }
 
         async function kirimPrintBluetooth(plat, waktu, ticketId) {
-            if (!bluetoothCharacteristic) {
-                alert("Printer belum terhubung! Silakan klik tombol 'Hubungkan Printer C58' di halaman utama.");
-                return false;
-            }
+            if (!bluetoothCharacteristic) return false;
             try {
-                const ESC = '\x1B';
-                const GS = '\x1D';
-                let perintahCetak = 
-                    ESC + '\x40' +                 
-                    ESC + '\x61' + '\x01' +        
-                    ESC + '\x21' + '\x08' + 'PANITIA PARKIR KARNAVAL\n' +
-                    '--------------------------------\n' +
-                    ESC + '\x21' + '\x20' + '\n ' + plat + ' \n\n' + 
-                    ESC + '\x21' + '\x00' +        
-                    ESC + '\x61' + '\x00' +        
-                    'Jenis : Motor\n' +
-                    'Masuk : ' + waktu + '\n' +
-                    'Bayar : Rp 10.000\n' +
-                    'Status: Di Dalam\n' +
-                    '--------------------------------\n' +
-                    ESC + '\x61' + '\x01' +        
-                    'ID Karcis: ' + ticketId + '\n\n' +
-                    'Struk hilang wajib tunjukin STNK\n' +
-                    '& no rangka, atau tunggu sampai\n' +
-                    'parkiran tutup.\n\n' +
-                    'TERIMA KASIH PANITIA\n\n\n' +
-                    GS + '\x56\x42\x00';          
-
+                const ESC = '\x1B', GS = '\x1D';
+                let perintahCetak = ESC + '\x40' + ESC + '\x61' + '\x01' + ESC + '\x21' + '\x08' + 'PANITIA PARKIR KARNAVAL\n' + '--------------------------------\n' + ESC + '\x21' + '\x20' + '\n ' + plat + ' \n\n' + ESC + '\x21' + '\x00' + ESC + '\x61' + '\x00' + 'Jenis : Motor\n' + 'Masuk : ' + waktu + '\n' + 'Bayar : Rp 10.000\n' + 'Status: Di Dalam\n' + '--------------------------------\n' + ESC + '\x61' + '\x01' + 'ID Karcis: ' + ticketId + '\n\n' + 'Struk hilang wajib tunjukin STNK\n' + '& no rangka, atau tunggu sampai\n' + 'parkiran tutup.\n\n' + 'TERIMA KASIH PANITIA\n\n\n' + GS + '\x56\x42\x00';          
                 let encoder = new TextEncoder();
                 await bluetoothCharacteristic.writeValue(encoder.encode(perintahCetak));
                 return true;
-            } catch (err) {
-                console.error("Gagal cetak:", err);
-                alert("Gagal mencetak ke printer Bluetooth.");
-                return false;
-            }
+            } catch (err) { return false; }
         }
 
-        // Menyimpan ke database memori HP & folder foto khusus
         async function simpanLokalDanCetak(finalPlat, imageBase64) {
             const ticketId = 'P' + Date.now().toString().slice(-6);
             const waktuMasuk = new Date().toLocaleString('id-ID');
-
             statusInfo.innerText = "Menyimpan ke Database HP...";
 
             try {
                 let dataParkir = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA)) || {};
                 let folderFoto = JSON.parse(localStorage.getItem(STORAGE_KEY_FOTO)) || {};
 
-                dataParkir[ticketId] = {
-                    ticketId: ticketId,
-                    noPlat: finalPlat,
-                    waktuMasuk: waktuMasuk
-                };
-
+                dataParkir[ticketId] = { ticketId: ticketId, noPlat: finalPlat, waktuMasuk: waktuMasuk };
                 folderFoto[ticketId] = imageBase64;
 
                 localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(dataParkir));
@@ -300,182 +159,35 @@
                 document.getElementById('preview-container').style.display = 'block';
 
                 if (bluetoothCharacteristic) {
-                    statusInfo.innerText = "Mencetak struk...";
                     await kirimPrintBluetooth(finalPlat, waktuMasuk, ticketId);
-                    statusInfo.innerText = "Tersimpan & Berhasil dicetak!";
+                    statusInfo.innerText = "Tersimpan & Dicetak!";
                 } else {
-                    statusInfo.innerText = "Tersimpan di HP! (Printer belum terkoneksi)";
+                    statusInfo.innerText = "Tersimpan di HP!";
                 }
-
-                btnAuto.removeAttribute('disabled');
-                btnManual.removeAttribute('disabled');
-
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Memori HP penuh atau gagal menyimpan.");
-                btnAuto.removeAttribute('disabled');
-                btnManual.removeAttribute('disabled');
-            }
+            } catch (error) { alert("Gagal menyimpan."); }
         }
 
         async function prosesParkirAuto() {
-            btnAuto.setAttribute('disabled', 'true');
-            btnManual.setAttribute('disabled', 'true');
-            
-            statusInfo.innerText = "1/2. Mengambil foto...";
+            statusInfo.innerText = "Mengambil foto...";
             const imageBase64 = ambilFotoCanvas();
-
-            statusInfo.innerText = "2/2. AI membaca plat...";
+            statusInfo.innerText = "AI membaca plat...";
             let finalPlat = "";
             try {
                 const result = await Tesseract.recognize(imageBase64, 'eng');
                 let text = result.data.text.replace(/[^A-Z0-9]/g, ' ').trim();
                 let words = text.split(/\s+/).filter(w => w.length >= 2 && w.length <= 8);
                 if (words.length > 0) finalPlat = words.slice(0, 2).join(' ');
-            } catch (err) { console.error(err); }
-
-            if (!finalPlat || finalPlat.length < 3) {
-                finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " HJ";
-            }
-
+            } catch (err) {}
+            if (!finalPlat || finalPlat.length < 3) finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " HJ";
             simpanLokalDanCetak(finalPlat, imageBase64);
         }
 
         function prosesParkirManual() {
             const inputPlat = document.getElementById('input-manual-plat').value.trim().toUpperCase();
-            if (!inputPlat) {
-                alert("Ketik nomor plat terlebih dahulu!");
-                return;
-            }
-
-            btnAuto.setAttribute('disabled', 'true');
-            btnManual.setAttribute('disabled', 'true');
-            statusInfo.innerText = "Memproses manual...";
-            
+            if (!inputPlat) { alert("Ketik nomor plat dulu!"); return; }
             const imageBase64 = ambilFotoCanvas();
             document.getElementById('input-manual-plat').value = '';
-
             simpanLokalDanCetak(inputPlat, imageBase64);
-        }
-
-        // Halaman 2: Menampilkan database masuk & tombol reprint
-        function muatTabelListKendaraan() {
-            const tbody = document.getElementById('list-kendaraan-body');
-            tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Memuat data...</td></tr>`;
-            
-            try {
-                let dataParkir = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA)) || {};
-                let keys = Object.keys(dataParkir);
-                
-                if (keys.length > 0) {
-                    tbody.innerHTML = "";
-                    keys.forEach(id => {
-                        let item = dataParkir[id];
-                        let tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><strong>${item.noPlat}</strong><br><span style="font-size:68%; color:#94a3b8;">${item.waktuMasuk}</span></td>
-                            <td style="text-align:center;"><button class="btn-reprint" onclick="reprintStruk('${item.noPlat}', '${item.waktuMasuk}', '${item.ticketId}')" type="button">🖨️ Cetak</button></td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#94a3b8;">Belum ada kendaraan parkir.</td></tr>`;
-                }
-            } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#f87171;">Gagal memuat database HP.</td></tr>`;
-            }
-        }
-
-        async function reprintStruk(plat, waktu, ticketId) {
-            statusInfo.innerText = "Mencetak ulang struk...";
-            let sukses = await kirimPrintBluetooth(plat, waktu, ticketId);
-            if(sukses) alert("Struk " + plat + " berhasil dicetak ulang!");
-        }
-
-        // Halaman 3: Scan Barcode Keluar & Foto Full
-        function muatDaftarTiketLokal() {
-            const select = document.getElementById('select-ticket');
-            select.innerHTML = '<option value="">-- Atau Pilih Kendaraan dari List --</option>';
-            try {
-                let dataParkir = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA)) || {};
-                for (let id in dataParkir) {
-                    let item = dataParkir[id];
-                    let opt = document.createElement('option');
-                    opt.value = id;
-                    opt.innerText = `${item.ticketId} - ${item.noPlat} (${item.waktuMasuk})`;
-                    select.appendChild(opt);
-                }
-            } catch (error) { console.error(error); }
-        }
-
-        function cariBarcodeKeluar() {
-            const query = document.getElementById('input-scan-barcode').value.trim();
-            if(query.length >= 4) {
-                tampilkanDataKeluar(query);
-            } else {
-                document.getElementById('detail-verifikasi').innerHTML = '';
-            }
-        }
-
-        function pilihDariDropdown() {
-            const ticketId = document.getElementById('select-ticket').value;
-            if(ticketId) {
-                document.getElementById('input-scan-barcode').value = ticketId;
-                tampilkanDataKeluar(ticketId);
-            }
-        }
-
-        function tampilkanDataKeluar(ticketId) {
-            const detailBox = document.getElementById('detail-verifikasi');
-            try {
-                let dataParkir = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA)) || {};
-                let folderFoto = JSON.parse(localStorage.getItem(STORAGE_KEY_FOTO)) || {};
-                
-                if (dataParkir[ticketId]) {
-                    let item = dataParkir[ticketId];
-                    let fotoBase64 = folderFoto[ticketId] || '';
-                    detailBox.innerHTML = `
-                        <div class="info-box">
-                            <strong>ID Karcis:</strong> ${item.ticketId}<br>
-                            <strong>No. Plat:</strong> ${item.noPlat}<br>
-                            <strong>Waktu Masuk:</strong> ${item.waktuMasuk}<br>
-                            <p style="margin:5px 0 2px 0;"><strong>Foto Kendaraan & Pengguna (Full):</strong></p>
-                            <img src="${fotoBase64}" class="verif-img-full" alt="Foto Full">
-                        </div>
-                        <button class="btn-keluar" onclick="konfirmasiKeluar('${ticketId}')" type="button">✅ Konfirmasi Keluar & Hapus Data</button>
-                    `;
-                } else {
-                    detailBox.innerHTML = `<div style="font-size:0.78rem; color:#f87171; margin-top:6px;">ID Karcis "${ticketId}" tidak ditemukan!</div>`;
-                }
-            } catch (error) { console.error(error); }
-        }
-
-        function konfirmasiKeluar(ticketId) {
-            if(confirm("Apakah kendaraan diizinkan keluar? Data & foto akan dihapus dari sistem.")) {
-                try {
-                    let dataParkir = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA)) || {};
-                    let folderFoto = JSON.parse(localStorage.getItem(STORAGE_KEY_FOTO)) || {};
-                    
-                    delete dataParkir[ticketId];
-                    delete folderFoto[ticketId]; // Hapus foto spesifik dari folder
-
-                    localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(dataParkir));
-                    localStorage.setItem(STORAGE_KEY_FOTO, JSON.stringify(folderFoto));
-
-                    alert("Kendaraan berhasil keluar!");
-                    switchView('view-masuk');
-                } catch (error) { alert("Gagal menghapus data."); }
-            }
-        }
-
-        // Tombol Reset untuk membersihkan seluruh data database & folder foto kamera sekaligus
-        function resetSemuaDataHP() {
-            if(confirm("PERHATIAN: Seluruh database kendaraan dan folder foto kamera akan dihapus permanen dari memori HP. Lanjutkan?")) {
-                localStorage.removeItem(STORAGE_KEY_DATA);
-                localStorage.removeItem(STORAGE_KEY_FOTO);
-                alert("Semua data database dan folder foto berhasil dikosongkan!");
-                switchView('view-masuk');
-            }
         }
     </script>
 </body>
