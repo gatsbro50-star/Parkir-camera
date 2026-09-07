@@ -10,8 +10,11 @@
         body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 5px; background: #121824; color: #fff; box-sizing: border-box; }
         .container { background: #1e293b; padding: 8px 10px; border-radius: 8px; display: inline-block; width: 100%; max-width: 320px; box-sizing: border-box; box-shadow: 0px 3px 10px rgba(0,0,0,0.4); }
         h2 { font-size: 1rem; margin: 3px 0 6px 0; }
-        .camera-box { width: 100%; max-width: 280px; margin: 0 auto; border-radius: 6px; overflow: hidden; background: #000; border: 2px solid #475569; }
-        video { width: 100%; aspect-ratio: 4/3; display: block; object-fit: cover; }
+        
+        /* Jendela Kamera Diperpanjang ke Bawah (Aspek Rasio Vertikal 3:4) */
+        .camera-box { width: 100%; max-width: 260px; margin: 0 auto; border-radius: 6px; overflow: hidden; background: #000; border: 2px solid #475569; }
+        video { width: 100%; aspect-ratio: 3/4; display: block; object-fit: cover; }
+
         input { width: 100%; padding: 7px; margin: 4px 0; font-size: 0.85rem; text-align: center; box-sizing: border-box; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 5px; }
         button { width: 100%; padding: 8px; font-size: 0.85rem; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 4px; font-weight: bold; text-decoration: none; display: inline-block; box-sizing: border-box; }
         .btn-auto { background: #22c55e; }
@@ -22,21 +25,17 @@
         #status-info { font-size: 0.8rem; color: #f87171; margin: 4px 0; font-weight: bold; min-height: 18px; }
         .divider { margin: 6px 0; border-top: 1px dashed #475569; position: relative; }
         .divider span { background: #1e293b; padding: 0 6px; position: relative; top: -8px; font-size: 0.7rem; color: #94a3b8; }
-        .preview-modal { background: #0f172a; border: 1px solid #475569; border-radius: 6px; padding: 8px; margin-top: 8px; text-align: left; display: none; }
-        .receipt-card { background: #fff; color: #000; padding: 8px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; font-size: 9.5px; text-align: left; line-height: 1.25; }
-        .receipt-title { font-size: 10.5px; font-weight: bold; text-align: center; margin-bottom: 2px; }
-        .receipt-plat { font-size: 14px; font-weight: bold; text-align: center; margin: 4px 0; letter-spacing: 1px; }
-        #preview-qrcode { display: flex; justify-content: center; margin: 4px 0; }
-        #preview-qrcode img { width: 65px; height: 65px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>PANITIA PARKIR KARNAVAL</h2>
+        
         <div class="camera-box">
             <video id="camera-stream" autoplay playsinline></video>
         </div>
-        <div id="status-info">Siap ambil foto & simpan database HP...</div>
+        
+        <div id="status-info">Kamera Siap...</div>
 
         <button id="btn-bt" class="btn-bt" onclick="hubungkanPrinterBT()" type="button">🔗 Hubungkan Printer C58</button>
         <button id="btn-auto" class="btn-auto" onclick="prosesParkirAuto()" type="button">🚀 Auto (Foto + AI Scan & Cetak)</button>
@@ -46,38 +45,14 @@
         <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat (Contoh: B 1234 HJ)">
         <button id="btn-manual" class="btn-manual" onclick="prosesParkirManual()" type="button">✍️ Cetak Manual No. Plat Ini</button>
         
-        <!-- Pindah file HTML terpisah untuk Halaman 2 dan 3 -->
         <a href="halaman2.html"><button class="btn-list" type="button">📋 Buka Halaman 2 (Data List & Reprint)</button></a>
         <a href="halaman3.html"><button class="btn-keluar" type="button">🚪 Buka Halaman 3 (Scan Barcode Keluar)</button></a>
-        
-        <div id="preview-container" class="preview-modal">
-            <div style="font-size: 0.75rem; margin-bottom: 4px; font-weight: bold; color: #38bdf8;">Preview Struk Terakhir:</div>
-            <div class="receipt-card">
-                <div class="receipt-title">PANITIA PARKIR KARNAVAL</div>
-                <div style="border-top: 1px dashed #000; margin: 2px 0;"></div>
-                <div id="r-plat" class="receipt-plat">-</div>
-                <div>Jenis : Motor</div>
-                <div>Masuk : <span id="r-waktu">-</span></div>
-                <div>Bayar : Rp 10.000</div>
-                <div>Status: Di Dalam</div>
-                <div style="border-top: 1px dashed #000; margin: 2px 0;"></div>
-                <center>
-                    <div id="preview-qrcode"></div>
-                    <div style="font-size: 7.5px; line-height: 1.1;">
-                        Struk hilang wajib tunjukin STNK & no rangka, atau tunggu parkiran tutup.<br>
-                        <strong>TERIMA KASIH PANITIA</strong>
-                    </div>
-                </center>
-            </div>
-        </div>
     </div>
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
         const video = document.getElementById('camera-stream');
         const statusInfo = document.getElementById('status-info');
-        const btnAuto = document.getElementById('btn-auto');
-        const btnManual = document.getElementById('btn-manual');
         const btnBt = document.getElementById('btn-bt');
         
         let bluetoothDevice = null;
@@ -86,7 +61,8 @@
         const STORAGE_KEY_DATA = 'karnaval_parkir_data';
         const STORAGE_KEY_FOTO = 'karnaval_parkir_folder_foto';
 
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: 640, height: 480 } })
+        // Mengaktifkan kamera depan/belakang dengan format vertikal
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: 480, height: 640 } })
             .then(stream => { video.srcObject = stream; })
             .catch(err => alert("Gagal akses kamera!"));
 
@@ -118,10 +94,10 @@
 
         function ambilFotoCanvas() {
             const canvas = document.getElementById('canvas');
-            canvas.width = 400; canvas.height = 300;
+            canvas.width = 600; canvas.height = 800; // Resolusi ditingkatkan agar AI lebih jelas membaca teks plat
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, 400, 300);
-            return canvas.toDataURL('image/jpeg', 0.35); 
+            ctx.drawImage(video, 0, 0, 600, 800);
+            return canvas.toDataURL('image/jpeg', 0.85); 
         }
 
         async function kirimPrintBluetooth(plat, waktu, ticketId) {
@@ -138,7 +114,7 @@
         async function simpanLokalDanCetak(finalPlat, imageBase64) {
             const ticketId = 'P' + Date.now().toString().slice(-6);
             const waktuMasuk = new Date().toLocaleString('id-ID');
-            statusInfo.innerText = "Menyimpan ke Database HP...";
+            statusInfo.innerText = "Menyimpan data...";
 
             try {
                 let dataParkir = JSON.parse(localStorage.getItem(STORAGE_KEY_DATA)) || {};
@@ -150,35 +126,48 @@
                 localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(dataParkir));
                 localStorage.setItem(STORAGE_KEY_FOTO, JSON.stringify(folderFoto));
 
-                document.getElementById('r-plat').innerText = finalPlat;
-                document.getElementById('r-waktu').innerText = waktuMasuk;
-                
-                const qrContainer = document.getElementById('preview-qrcode');
-                qrContainer.innerHTML = "";
-                new QRCode(qrContainer, { text: ticketId, width: 65, height: 65 });
-                document.getElementById('preview-container').style.display = 'block';
-
                 if (bluetoothCharacteristic) {
                     await kirimPrintBluetooth(finalPlat, waktuMasuk, ticketId);
-                    statusInfo.innerText = "Tersimpan & Dicetak!";
-                } else {
-                    statusInfo.innerText = "Tersimpan di HP!";
                 }
-            } catch (error) { alert("Gagal menyimpan."); }
+                
+                statusInfo.innerText = "Berhasil Disimpan!";
+                alert("Berhasil Disimpan!\nNo Plat Terbaca: " + finalPlat + "\nID: " + ticketId);
+            } catch (error) { 
+                alert("Gagal menyimpan."); 
+            }
         }
 
         async function prosesParkirAuto() {
             statusInfo.innerText = "Mengambil foto...";
             const imageBase64 = ambilFotoCanvas();
-            statusInfo.innerText = "AI membaca plat...";
+            statusInfo.innerText = "AI sedang membaca plat...";
+            
             let finalPlat = "";
             try {
-                const result = await Tesseract.recognize(imageBase64, 'eng');
-                let text = result.data.text.replace(/[^A-Z0-9]/g, ' ').trim();
+                // Menggunakan Tesseract dengan konfigurasi karakter khusus plat nomor
+                const worker = await Tesseract.createWorker('eng');
+                await worker.setParameters({
+                    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+                });
+                const ret = await worker.recognize(imageBase64);
+                await worker.terminate();
+
+                let text = ret.data.text.replace(/[\n\r]+/g, ' ').replace(/[^A-Z0-9]/g, ' ').trim();
                 let words = text.split(/\s+/).filter(w => w.length >= 2 && w.length <= 8);
-                if (words.length > 0) finalPlat = words.slice(0, 2).join(' ');
-            } catch (err) {}
-            if (!finalPlat || finalPlat.length < 3) finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " HJ";
+                
+                if (words.length > 0) {
+                    // Ambil gabungan teks pertama yang menyerupai plat nomor
+                    finalPlat = words.slice(0, 2).join(' ');
+                }
+            } catch (err) {
+                console.log("AI Scan Error:", err);
+            }
+
+            // Fallback jika AI gagal mendeteksi teks plat pada foto secara akurat
+            if (!finalPlat || finalPlat.length < 3) {
+                finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " HJ";
+            }
+
             simpanLokalDanCetak(finalPlat, imageBase64);
         }
 
