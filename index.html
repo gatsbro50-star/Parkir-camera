@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Parkir - Direct Bluetooth Print C58</title>
+    <title>Sistem Parkir - Format Struk Karnaval</title>
     <!-- Library QRCode & Tesseract AI OCR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -33,42 +33,68 @@
         window.get = get;
     </script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 10px; background: #f4f4f9; color: #333; }
-        .container { background: white; padding: 15px; border-radius: 8px; display: inline-block; width: 100%; max-width: 400px; box-sizing: border-box; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 10px; background: #121824; color: #fff; }
+        .container { background: #1e293b; padding: 15px; border-radius: 8px; display: inline-block; width: 100%; max-width: 400px; box-sizing: border-box; box-shadow: 0px 0px 10px rgba(0,0,0,0.3); }
         video { width: 100%; aspect-ratio: 3/4; border-radius: 5px; background: #ddd; object-fit: cover; }
-        input, select { width: 90%; padding: 10px; margin: 8px 0; font-size: 1rem; text-align: center; box-sizing: border-box; }
+        input, select { width: 90%; padding: 10px; margin: 8px 0; font-size: 1rem; text-align: center; box-sizing: border-box; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 5px; }
         button { width: 100%; padding: 12px; font-size: 1rem; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 5px; font-weight: bold; }
         
-        .btn-auto { background: #28a745; }
-        .btn-manual { background: #ffc107; color: #333; }
-        .btn-bt { background: #6f42c1; }
-        .btn-auto:disabled, .btn-manual:disabled, .btn-bt:disabled { background: #cccccc; cursor: not-allowed; color: #666; }
+        .btn-auto { background: #22c55e; }
+        .btn-manual { background: #eab308; color: #000; }
+        .btn-bt { background: #8b5cf6; }
+        .btn-auto:disabled, .btn-manual:disabled, .btn-bt:disabled { background: #475569; cursor: not-allowed; color: #94a3b8; }
         
-        .btn-menu { background: #007bff; margin-top: 15px; font-size: 1rem; padding: 10px; }
-        .btn-keluar { background: #dc3545; }
+        .btn-menu { background: #3b82f6; margin-top: 15px; font-size: 1rem; padding: 10px; }
+        .btn-keluar { background: #ef4444; }
         
         .view-section { display: none; }
         .active-view { display: block; }
-        #status-info { font-size: 0.95rem; color: #d9534f; margin: 8px 0; font-weight: bold; min-height: 25px; }
+        #status-info { font-size: 0.95rem; color: #f87171; margin: 8px 0; font-weight: bold; min-height: 25px; }
 
-        .divider { margin: 15px 0; border-top: 1px dashed #ccc; position: relative; }
-        .divider span { background: white; padding: 0 10px; position: relative; top: -10px; font-size: 0.85rem; color: #777; }
+        .divider { margin: 15px 0; border-top: 1px dashed #475569; position: relative; }
+        .divider span { background: #1e293b; padding: 0 10px; position: relative; top: -10px; font-size: 0.85rem; color: #94a3b8; }
 
-        .verif-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; margin-top: 10px; }
-        .info-box { text-align: left; margin-top: 15px; font-size: 1rem; line-height: 1.5; background: #f9f9f9; padding: 10px; border-radius: 5px; }
+        /* Tampilan Preview Struk di Layar HP (Mirip Gambar) */
+        .preview-modal {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: left;
+            display: none;
+        }
+        .receipt-card {
+            background: #fff;
+            color: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .receipt-card center { text-align: center; }
+        .receipt-title { font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 5px; }
+        .receipt-plat { font-size: 18px; font-weight: bold; text-align: center; margin: 8px 0; letter-spacing: 1px; }
+        #preview-qrcode { display: flex; justify-content: center; margin: 10px 0; }
+        #preview-qrcode img { width: 100px; height: 100px; }
+
+        .verif-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 5px; border: 1px solid #475569; margin-top: 10px; }
+        .info-box { text-align: left; margin-top: 15px; font-size: 1rem; line-height: 1.5; background: #0f172a; padding: 10px; border-radius: 5px; border: 1px solid #475569; }
     </style>
 </head>
 <body>
 
     <!-- ================= VIEW 1: GATE MASUK ================= -->
     <div id="view-masuk" class="container active-view">
-        <h2>Gate Masuk Parkir</h2>
+        <h2>PANITIA PARKIR KARNAVAL</h2>
         <video id="camera-stream" autoplay playsinline></video>
         
         <div id="status-info">Menunggu koneksi printer Bluetooth...</div>
 
-        <!-- Tombol Wajib Hubungkan Printer C58 Dahulu -->
-        <button id="btn-bt" class="btn-bt" onclick="hubungkanPrinterBT()">🔗 Hubungkan Printer Bluetooth C58</button>
+        <!-- Tombol Hubungkan Printer Bluetooth C58 -->
+        <button id="btn-bt" class="btn-bt" onclick="hubungkanPrinterBT()">🔗 Hubungkan Printer C58</button>
 
         <!-- Tombol Utama: Auto Foto + AI OCR + Firebase + Direct Print -->
         <button id="btn-auto" class="btn-auto" onclick="prosesParkirAuto()" disabled>🚀 Auto (Foto + AI Scan & Cetak)</button>
@@ -76,10 +102,32 @@
         <div class="divider"><span>ATAU MANUAL JIKA PLAT BURAM</span></div>
 
         <!-- Opsi Cadangan: Input Manual -->
-        <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat Manual (Misal: B 1234 ABC)">
+        <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat (Misal: B 1234 HJ)">
         <button id="btn-manual" class="btn-manual" onclick="prosesParkirManual()" disabled>✍️ Cetak Manual dengan No. Plat Ini</button>
         
         <button class="btn-menu" onclick="switchView('view-cek')">Menu Keluar / Verifikasi</button>
+        
+        <!-- PREVIEW STRUK DI LAYAR -->
+        <div id="preview-container" class="preview-modal">
+            <div style="font-size: 0.9rem; margin-bottom: 8px; font-weight: bold; color: #38bdf8;">Preview Struk Terakhir:</div>
+            <div class="receipt-card">
+                <div class="receipt-title">PANITIA PARKIR KARNAVAL</div>
+                <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+                <div id="r-plat" class="receipt-plat">-</div>
+                <div>Jenis : Motor</div>
+                <div>Masuk : <span id="r-waktu">-</span></div>
+                <div>Bayar : Rp 10.000</div>
+                <div>Status: Di Dalam</div>
+                <div style="border-top: 1px dashed #000; margin: 4px 0;"></div>
+                <center>
+                    <div id="preview-qrcode"></div>
+                    <div style="font-size: 9px; line-height: 1.2;">
+                        Struk hilang wajib tunjukin STNK & no rangka, atau tunggu sampai parkiran tutup.<br>
+                        <strong>TERIMA KASIH PANITIA</strong>
+                    </div>
+                </center>
+            </div>
+        </div>
     </div>
 
     <!-- ================= VIEW 2: CEK KELUAR ================= -->
@@ -90,7 +138,7 @@
             <option value="">-- Pilih Kendaraan Parkir --</option>
         </select>
         <div id="detail-verifikasi"></div>
-        <button style="background:#6c757d; margin-top:15px; padding:10px;" onclick="switchView('view-masuk')">Kembali ke Gate Masuk</button>
+        <button class="btn-menu" style="background:#475569;" onclick="switchView('view-masuk')">Kembali ke Gate Masuk</button>
     </div>
 
     <canvas id="canvas" style="display:none;"></canvas>
@@ -128,16 +176,13 @@
                 statusInfo.innerText = "Menghubungkan ke printer...";
                 const server = await bluetoothDevice.gatt.connect();
                 
-                // Cari service printer thermal secara otomatis
                 const services = await server.getPrimaryServices();
-                let foundService = null;
                 let foundChar = null;
 
                 for (let service of services) {
                     const characteristics = await service.getCharacteristics();
                     for (let char of characteristics) {
                         if (char.properties.write || char.properties.writeWithoutResponse) {
-                            foundService = service;
                             foundChar = char;
                             break;
                         }
@@ -148,7 +193,7 @@
                 if (foundChar) {
                     bluetoothCharacteristic = foundChar;
                     statusInfo.innerText = "Printer C58 Siap Digunakan!";
-                    btnBt.style.background = "#28a745";
+                    btnBt.style.background = "#22c55e";
                     btnBt.innerText = "✔ Printer C58 Terhubung";
                     btnAuto.disabled = false;
                     btnManual.disabled = false;
@@ -169,10 +214,10 @@
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            return canvas.toDataURL('image/jpeg', 0.6); // Kompres agar ringan disimpan ke Firebase
+            return canvas.toDataURL('image/jpeg', 0.6);
         }
 
-        // 2. Simpan ke Firebase & Langsung Kirim Perintah Cetak ke Bluetooth C58
+        // 2. Simpan ke Firebase & Cetak Langsung dengan Format Struk Karnaval
         async function simpanFirebaseDanCetakBluetooth(finalPlat, imageBase64) {
             const ticketId = 'P' + Date.now().toString().slice(-6);
             const waktuMasuk = new Date().toLocaleString('id-ID');
@@ -180,7 +225,7 @@
             statusInfo.innerText = "Menyimpan foto ke Firebase...";
 
             try {
-                // Simpan data & foto ke Firebase Realtime Database
+                // Simpan data ke Firebase Realtime Database
                 const parkirRef = window.ref(window.db, 'parkir_aktif/' + ticketId);
                 await window.set(parkirRef, {
                     ticketId: ticketId,
@@ -189,31 +234,45 @@
                     foto: imageBase64
                 });
 
+                // Tampilkan preview di layar sesuai desain gambar
+                document.getElementById('r-plat').innerText = finalPlat;
+                document.getElementById('r-waktu').innerText = waktuMasuk;
+                
+                const qrContainer = document.getElementById('preview-qrcode');
+                qrContainer.innerHTML = "";
+                new QRCode(qrContainer, { text: ticketId, width: 90, height: 90 });
+                document.getElementById('preview-container').style.display = 'block';
+
                 statusInfo.innerText = "Mengirim data ke printer C58...";
 
-                // Format Perintah Struk ESC/POS khusus Printer Thermal 58mm
+                // Format ESC/POS persis seperti tampilan struk karnaval
                 const ESC = '\x1B';
                 const GS = '\x1D';
                 let perintahCetak = 
-                    ESC + '\x40' +                 // Initialize printer
-                    ESC + '\x61' + '\x01' +        // Center alignment
-                    '\x1B\x21\x30' + 'PARKIR MANDIRI\n' + // Double height/width text
-                    '\x1B\x21\x00' + 'Jl. Otomatis No. 1 C58\n' +
+                    ESC + '\x40' +                 // Initialize
+                    ESC + '\x61' + '\x01' +        // Center
+                    ESC + '\x21' + '\x08' + 'PANITIA PARKIR KARNAVAL\n' +
                     '--------------------------------\n' +
-                    ESC + '\x61' + '\x00' +        // Left alignment
-                    'No. Plat : ' + finalPlat + '\n' +
-                    'Masuk    : ' + waktuMasuk + '\n' +
-                    'ID Tiket : ' + ticketId + '\n' +
+                    ESC + '\x21' + '\x20' + '\n ' + finalPlat + ' \n\n' + // Large Plat
+                    ESC + '\x21' + '\x00' +        // Normal text
+                    ESC + '\x61' + '\x00' +        // Left
+                    'Jenis : Motor\n' +
+                    'Masuk : ' + waktuMasuk + '\n' +
+                    'Bayar : Rp 10.000\n' +
+                    'Status: Di Dalam\n' +
                     '--------------------------------\n' +
-                    ESC + '\x61' + '\x01' +        // Center alignment
-                    'Simpan Karis Ini!\n' +
-                    'Terima Kasih\n\n\n' +
-                    GS + '\x56\x42\x00';          // Cut paper (jika didukung printer)
+                    ESC + '\x61' + '\x01' +        // Center
+                    'ID Karcis: ' + ticketId + '\n\n' +
+                    'Struk hilang wajib tunjukin STNK\n' +
+                    '& no rangka, atau tunggu sampai\n' +
+                    'parkiran tutup.\n\n' +
+                    'TERIMA KASIH PANITIA\n\n\n' +
+                    GS + '\x56\x42\x00';          // Cut
 
                 let encoder = new TextEncoder();
                 await bluetoothCharacteristic.writeValue(encoder.encode(perintahCetak));
 
-                statusInfo.innerText = "Selesai! Siap ambil foto berikutnya...";
+                statusInfo.innerText = "Selesai! Struk berhasil dicetak.";
                 btnAuto.disabled = false;
                 btnManual.disabled = false;
 
@@ -248,7 +307,7 @@
             }
 
             if (!finalPlat || finalPlat.length < 3) {
-                finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " XXX";
+                finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " HJ";
             }
 
             statusInfo.innerText = "3/3. Simpan Firebase & Auto Print...";
