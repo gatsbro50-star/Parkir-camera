@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Parkir - Auto & Manual Input</title>
+    <title>Sistem Parkir - Printer C58 (58mm)</title>
     <!-- Library QRCode & Tesseract AI OCR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -28,20 +28,27 @@
         .divider { margin: 15px 0; border-top: 1px dashed #ccc; position: relative; }
         .divider span { background: white; padding: 0 10px; position: relative; top: -10px; font-size: 0.85rem; color: #777; }
 
-        /* Styling Struk Thermal (Hanya Text & QR Code) */
+        /* ================= FORMAT KHUSUS PRINTER THERMAL C58 (58mm) ================= */
         @media print {
-            body { margin: 0; background: white; }
+            body { 
+                margin: 0; 
+                padding: 0;
+                background: white; 
+            }
             .no-print { display: none !important; }
             .struk {
                 display: block !important;
-                width: 58mm;
+                width: 48mm; /* Disesuaikan agar pas di kertas 58mm tanpa terpotong di pinggir */
+                margin: 0 auto;
                 font-family: 'Courier New', Courier, monospace;
-                font-size: 11px;
+                font-size: 10px;
+                line-height: 1.2;
                 text-align: left;
-                padding: 5px;
+                padding: 2px;
             }
-            #print-qrcode { margin: 10px auto; display: flex; justify-content: center; }
-            #print-qrcode img { width: 100px; height: 100px; }
+            .struk center { text-align: center; }
+            #print-qrcode { margin: 6px auto; display: flex; justify-content: center; }
+            #print-qrcode img { width: 80px; height: 80px; }
         }
         .struk { display: none; }
         
@@ -58,12 +65,12 @@
         
         <div id="status-info">Siap ambil foto...</div>
 
-        <!-- Opsi 1: Full Auto (Foto -> AI OCR -> Simpan -> Print) -->
+        <!-- Tombol Utama: Auto Foto + AI OCR + Auto Print -->
         <button id="btn-auto" class="btn-auto" onclick="prosesParkirAuto()">🚀 Auto (Foto + AI Scan & Cetak)</button>
 
-        <div class="divider"><span>ATAU JIKA PLAT BURAM / TIDAK TERBACA</span></div>
+        <div class="divider"><span>ATAU MANUAL JIKA PLAT BURAM</span></div>
 
-        <!-- Opsi 2: Input Manual Jika OCR Gagal -->
+        <!-- Opsi Cadangan: Input Manual -->
         <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat Manual (Misal: B 1234 ABC)">
         <button id="btn-manual" class="btn-manual" onclick="prosesParkirManual()">✍️ Cetak Manual dengan No. Plat Ini</button>
         
@@ -83,10 +90,10 @@
 
     <canvas id="canvas" style="display:none;"></canvas>
 
-    <!-- ================= STRUK THERMAL (DICETAK) ================= -->
+    <!-- ================= STRUK THERMAL C58 (58mm) ================= -->
     <div id="struk-area" class="struk">
         <center>
-            <strong>PARKIR MANDIRI</strong><br>
+            <strong>PARKIR MANDIRI C58</strong><br>
             Jl. Otomatis No. 1<br>
             --------------------------------
         </center>
@@ -96,7 +103,8 @@
         <center>
             <div id="print-qrcode"></div>
             Simpan karcis ini!<br>
-            Terima Kasih
+            Terima Kasih<br>
+            ================================
         </center>
     </div>
 
@@ -117,7 +125,7 @@
             if(viewId === 'view-cek') muatDaftarTiket();
         }
 
-        // Ambil Foto dari Kamera (Helper Bersama)
+        // Ambil Foto dari Kamera
         function ambilFotoCanvas() {
             const canvas = document.getElementById('canvas');
             canvas.width = video.videoWidth;
@@ -126,7 +134,7 @@
             return canvas.toDataURL('image/jpeg');
         }
 
-        // Simpan Data & Cetak Struk (Helper Bersama)
+        // Simpan Data & Langsung Perintahkan Auto Print ke C58
         function finalisasiDanCetak(finalPlat, imageBase64) {
             const ticketId = 'P' + Date.now().toString().slice(-6);
             const waktuMasuk = new Date().toLocaleString('id-ID');
@@ -141,32 +149,34 @@
             };
             localStorage.setItem('parkir_aktif', JSON.stringify(dataParkir));
 
-            // Isi template struk
+            // Isi template struk thermal 58mm
             document.getElementById('s-plat').innerText = finalPlat;
             document.getElementById('s-waktu').innerText = waktuMasuk;
             
             const qrContainer = document.getElementById('print-qrcode');
             qrContainer.innerHTML = "";
-            new QRCode(qrContainer, { text: ticketId, width: 90, height: 90 });
+            new QRCode(qrContainer, { text: ticketId, width: 75, height: 75 });
 
-            statusInfo.innerText = "Mencetak karcis...";
+            statusInfo.innerText = "Mengirim ke printer C58...";
+            
+            // Jeda sekejap untuk memastikan QR code ter-render sebelum window.print()
             setTimeout(() => {
                 window.print();
                 statusInfo.innerText = "Siap ambil foto...";
                 btnAuto.disabled = false;
                 btnManual.disabled = false;
-            }, 500);
+            }, 600);
         }
 
-        // 1. Tombol Auto (AI OCR)
+        // 1. Proses Full Auto (Foto -> AI OCR -> Auto Print)
         async function prosesParkirAuto() {
             btnAuto.disabled = true;
             btnManual.disabled = true;
             
-            statusInfo.innerText = "1/3. Mengambil foto...";
+            statusInfo.innerText = "1/3. Mengambil foto kendaraan...";
             const imageBase64 = ambilFotoCanvas();
 
-            statusInfo.innerText = "2/3. AI membaca nomor plat...";
+            statusInfo.innerText = "2/3. AI sedang membaca nomor plat...";
             let finalPlat = "";
             try {
                 const result = await Tesseract.recognize(imageBase64, 'eng');
@@ -180,25 +190,28 @@
                 console.error(err);
             }
 
-            // Jika AI gagal membaca/buram, gunakan fallback otomatis
+            // Jika AI gagal mendeteksi atau kosong, berikan plat cadangan
             if (!finalPlat || finalPlat.length < 3) {
                 finalPlat = "B " + Math.floor(1000 + Math.random() * 9000) + " XXX";
             }
 
+            statusInfo.innerText = "3/3. Menyimpan & Mencetak Struk...";
             finalisasiDanCetak(finalPlat, imageBase64);
         }
 
-        // 2. Tombol Manual (Ketik Sendiri jika Plat Buram/AI Gagal)
+        // 2. Proses Manual (Jika plat buram / AI tidak terbaca)
         function prosesParkirManual() {
             const inputPlat = document.getElementById('input-manual-plat').value.trim().toUpperCase();
             if (!inputPlat) {
-                alert("Silakan ketik nomor plat kendaraan terlebih dahulu pada kolom yang disediakan!");
+                alert("Silakan ketik nomor plat kendaraan terlebih dahulu!");
+                btnAuto.disabled = false;
+                btnManual.disabled = false;
                 return;
             }
 
             btnAuto.disabled = true;
             btnManual.disabled = true;
-            statusInfo.innerText = "Mengambil foto untuk data manual...";
+            statusInfo.innerText = "Mengambil foto & mencetak...";
             
             const imageBase64 = ambilFotoCanvas();
             document.getElementById('input-manual-plat').value = ''; // Reset input
