@@ -38,8 +38,8 @@
         
         h2 { font-size: 1rem; margin: 3px 0 6px 0; letter-spacing: 0.5px; }
 
-        /* Jendela Kamera Diperkecil & Kompak */
-        .camera-box { width: 100%; max-width: 160px; margin: 0 auto; border-radius: 5px; overflow: hidden; background: #000; border: 1px solid #475569; }
+        /* Jendela Kamera Diperbesar Sedikit */
+        .camera-box { width: 100%; max-width: 220px; margin: 0 auto; border-radius: 5px; overflow: hidden; background: #000; border: 1px solid #475569; }
         video { width: 100%; aspect-ratio: 4/3; display: block; object-fit: cover; }
 
         input, select { width: 100%; padding: 7px; margin: 4px 0; font-size: 0.85rem; text-align: center; box-sizing: border-box; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 5px; }
@@ -53,7 +53,7 @@
         .btn-menu { background: #3b82f6; margin-top: 6px; padding: 7px; }
         .btn-list { background: #0ea5e9; margin-top: 6px; padding: 7px; }
         .btn-keluar { background: #ef4444; padding: 6px; font-size: 0.8rem; margin-top: 4px; }
-        .btn-reprint { background: #f97316; padding: 6px; font-size: 0.8rem; margin-top: 4px; }
+        .btn-reprint { background: #f97316; padding: 5px 8px; font-size: 0.75rem; border-radius: 4px; margin: 0; width: auto; }
 
         #status-info { font-size: 0.8rem; color: #f87171; margin: 4px 0; font-weight: bold; min-height: 18px; }
 
@@ -61,9 +61,9 @@
         .divider span { background: #1e293b; padding: 0 6px; position: relative; top: -8px; font-size: 0.7rem; color: #94a3b8; }
 
         /* Tabel List Kendaraan */
-        .table-container { max-height: 250px; overflow-y: auto; margin-top: 8px; border: 1px solid #475569; border-radius: 5px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background: #0f172a; text-align: left; }
-        th, td { padding: 6px; border-bottom: 1px solid #1e293b; }
+        .table-container { max-height: 260px; overflow-y: auto; margin-top: 6px; border: 1px solid #475569; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; background: #0f172a; text-align: left; }
+        th, td { padding: 6px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
         th { background: #1e293b; color: #38bdf8; position: sticky; top: 0; }
 
         /* Preview Struk */
@@ -81,7 +81,7 @@
 </head>
 <body>
 
-    <!-- ================= VIEW 1: GATE MASUK ================= -->
+    <!-- ================= HALAMAN 1: GATE MASUK ================= -->
     <div id="view-masuk" class="container active-view">
         <h2>PANITIA PARKIR KARNAVAL</h2>
         
@@ -99,8 +99,8 @@
         <input type="text" id="input-manual-plat" placeholder="Ketik No. Plat (Contoh: B 1234 HJ)">
         <button id="btn-manual" class="btn-manual" onclick="prosesParkirManual()" type="button">✍️ Cetak Manual No. Plat Ini</button>
         
-        <!-- Tombol Pindah ke Halaman List & Halaman Keluar -->
-        <button class="btn-list" onclick="switchView('view-list')" type="button">📋 Lihat Data & Reprint Struk</button>
+        <!-- Tombol Pindah Halaman -->
+        <button class="btn-list" onclick="switchView('view-list')" type="button">📋 Halaman 2: Data List & Reprint Struk</button>
         <button class="btn-menu" onclick="switchView('view-cek')" type="button">🚪 Menu Verifikasi Keluar</button>
         
         <!-- PREVIEW STRUK DI LAYAR -->
@@ -126,16 +126,16 @@
         </div>
     </div>
 
-    <!-- ================= VIEW 2: HALAMAN LIST KENDARAAN & REPRINT ================= -->
+    <!-- ================= HALAMAN 2: DATA LIST KENDARAAN & REPRINT ================= -->
     <div id="view-list" class="container view-section" style="display:none;">
-        <h2>Data List Kendaraan</h2>
-        <p style="font-size: 0.8rem; margin: 4px 0;">Daftar parkir aktif & tombol cetak ulang:</p>
+        <h2>Data List Kendaraan (Reprint)</h2>
+        <p style="font-size: 0.8rem; margin: 4px 0;">Daftar kendaraan masuk & tombol cetak ulang:</p>
         
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Plat / Masuk</th>
+                        <th>Plat / Waktu</th>
                         <th style="text-align:center;">Aksi</th>
                     </tr>
                 </thead>
@@ -145,18 +145,18 @@
             </table>
         </div>
 
-        <button class="btn-menu" style="background:#475569; margin-top:8px;" onclick="switchView('view-masuk')" type="button">Kembali ke Gate Masuk</button>
+        <button class="btn-menu" style="background:#475569; margin-top:8px;" onclick="switchView('view-masuk')" type="button">⬅️ Kembali ke Gate Masuk</button>
     </div>
 
-    <!-- ================= VIEW 3: CEK KELUAR ================= -->
+    <!-- ================= HALAMAN 3: CEK KELUAR ================= -->
     <div id="view-cek" class="container view-section" style="display:none;">
         <h2>Verifikasi Keluar</h2>
-        <p style="font-size: 0.8rem; margin: 4px 0;">Pilih tiket kendaraan keluar:</p>
+        <p style="font-size: 0.8rem; margin: 0px 0;">Pilih tiket kendaraan keluar:</p>
         <select id="select-ticket" onchange="tampilkanVerifikasi()">
             <option value="">-- Pilih Kendaraan Parkir --</option>
         </select>
         <div id="detail-verifikasi"></div>
-        <button class="btn-menu" style="background:#475569;" onclick="switchView('view-masuk')" type="button">Kembali ke Gate Masuk</button>
+        <button class="btn-menu" style="background:#475569;" onclick="switchView('view-masuk')" type="button">⬅️ Kembali ke Gate Masuk</button>
     </div>
 
     <canvas id="canvas" style="display:none;"></canvas>
@@ -230,20 +230,18 @@
             }
         }
 
-        // Kompresi foto agar cepat terkirim ke Firebase
         function ambilFotoCanvas() {
             const canvas = document.getElementById('canvas');
-            canvas.width = 320;
-            canvas.height = 240;
+            canvas.width = 400;
+            canvas.height = 300;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, 320, 240);
-            return canvas.toDataURL('image/jpeg', 0.4);
+            ctx.drawImage(video, 0, 0, 400, 300);
+            return canvas.toDataURL('image/jpeg', 0.35);
         }
 
-        // Kirim perintah cetak ESC/POS ke printer C58
         async function kirimPrintBluetooth(plat, waktu, ticketId) {
             if (!bluetoothCharacteristic) {
-                alert("Printer belum terhubung! Silakan klik 'Hubungkan Printer C58' di halaman utama.");
+                alert("Printer belum terhubung! Silakan klik tombol 'Hubungkan Printer C58' di halaman utama.");
                 return false;
             }
             try {
@@ -280,7 +278,6 @@
             }
         }
 
-        // Proses Simpan ke Firebase & Cetak Cepat
         async function simpanFirebaseDanCetakBluetooth(finalPlat, imageBase64) {
             const ticketId = 'P' + Date.now().toString().slice(-6);
             const waktuMasuk = new Date().toLocaleString('id-ID');
@@ -289,7 +286,6 @@
 
             try {
                 const parkirRef = window.ref(window.db, 'parkir_aktif/' + ticketId);
-                // Simpan data instan ke Firebase
                 await window.set(parkirRef, {
                     ticketId: ticketId,
                     noPlat: finalPlat,
@@ -297,7 +293,6 @@
                     foto: imageBase64
                 });
 
-                // Tampilkan preview di layar
                 document.getElementById('r-plat').innerText = finalPlat;
                 document.getElementById('r-waktu').innerText = waktuMasuk;
                 
@@ -365,7 +360,6 @@
             simpanFirebaseDanCetakBluetooth(inputPlat, imageBase64);
         }
 
-        // Muat tabel untuk halaman Halaman List & Reprint
         async function muatTabelListKendaraan() {
             const tbody = document.getElementById('list-kendaraan-body');
             tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Memuat data...</td></tr>`;
@@ -379,7 +373,7 @@
                         let item = dataParkir[id];
                         let tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td><strong>${item.noPlat}</strong><br><span style="font-size:70%; color:#94a3b8;">${item.waktuMasuk}</span></td>
+                            <td><strong>${item.noPlat}</strong><br><span style="font-size:68%; color:#94a3b8;">${item.waktuMasuk}</span></td>
                             <td style="text-align:center;"><button class="btn-reprint" onclick="reprintStruk('${item.noPlat}', '${item.waktuMasuk}', '${item.ticketId}')" type="button">🖨️ Cetak</button></td>
                         `;
                         tbody.appendChild(tr);
@@ -392,7 +386,6 @@
             }
         }
 
-        // Fungsi Reprint Struk dari Halaman List
         async function reprintStruk(plat, waktu, ticketId) {
             statusInfo.innerText = "Mencetak ulang struk...";
             let sukses = await kirimPrintBluetooth(plat, waktu, ticketId);
